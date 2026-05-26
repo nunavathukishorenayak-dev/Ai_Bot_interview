@@ -1,22 +1,25 @@
 import streamlit as st
 from openai import OpenAI
-from dotenv import load_dotenv
-import os
 
-# Load environment variables
-load_dotenv()
+# Page Config
+st.set_page_config(
+    page_title="AI Interview Preparation Bot",
+    page_icon="🤖",
+    layout="centered"
+)
 
+# Title
+st.title("🤖 AI Interview Preparation Bot")
+
+st.write("Practice mock interviews with AI")
+
+# OpenRouter Client
 client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
     api_key=st.secrets["OPENROUTER_API_KEY"]
 )
 
-# Page title
-st.title("AI Interview Preparation Bot")
-
-st.write("Practice interviews with AI")
-
-# Select role
+# Role Selection
 role = st.selectbox(
     "Select Job Role",
     [
@@ -28,7 +31,7 @@ role = st.selectbox(
     ]
 )
 
-# Experience level
+# Experience Selection
 experience = st.selectbox(
     "Experience Level",
     [
@@ -38,74 +41,93 @@ experience = st.selectbox(
     ]
 )
 
-# Generate questions button
+# Generate Questions
 if st.button("Generate Interview Questions"):
 
-    prompt = f"""
-    Generate 5 interview questions for a
-    {experience} {role}.
+    with st.spinner("Generating questions..."):
 
-    Include:
-    - Technical questions
-    - Scenario based questions
-    - Problem solving questions
-    """
+        prompt = f"""
+        Generate 5 interview questions for a
+        {experience} {role} candidate.
 
-    response = client.chat.completions.create(
-        model="mistralai/mistral-7b-instruct",
-        messages=[
-            {
-                "role": "user",
-                "content": prompt
-            }
-        ]
-    )
+        Include:
+        - Technical questions
+        - Scenario-based questions
+        - Problem-solving questions
 
-    questions = response.choices[0].message.content
+        Keep questions beginner friendly.
+        """
 
-    st.subheader("Interview Questions")
-    st.write(questions)
+        try:
 
-# User answer section
-st.subheader("Answer a Question")
+            response = client.chat.completions.create(
+                model="mistralai/mistral-7b-instruct",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ]
+            )
 
-question = st.text_input("Paste Question Here")
+            questions = response.choices[0].message.content
+
+            st.subheader("Interview Questions")
+            st.write(questions)
+
+        except Exception as e:
+
+            st.error(f"Error: {e}")
+
+# Answer Evaluation Section
+st.subheader("Answer Evaluation")
+
+question = st.text_input("Paste Interview Question")
 
 answer = st.text_area("Write Your Answer")
 
-# Evaluate answer
+# Evaluate Button
 if st.button("Evaluate My Answer"):
 
-    feedback_prompt = f"""
-    You are an interview evaluator.
+    with st.spinner("Evaluating answer..."):
 
-    Question:
-    {question}
+        feedback_prompt = f"""
+        You are an interview evaluator.
 
-    Candidate Answer:
-    {answer}
+        Interview Question:
+        {question}
 
-    Evaluate the answer.
+        Candidate Answer:
+        {answer}
 
-    Give:
-    1. Score out of 10
-    2. Technical Accuracy
-    3. Communication
-    4. Improvements
-    5. Better Sample Answer
-    """
+        Evaluate the answer.
 
-    feedback_response = client.chat.completions.create(
-        model="gpt-4.1-mini",
-        messages=[
-            {
-                "role": "user",
-                "content": feedback_prompt
-            }
-        ]
-    )
+        Give:
+        1. Score out of 10
+        2. Strengths
+        3. Improvements
+        4. Better Sample Answer
 
-    feedback = feedback_response.choices[0].message.content
+        Keep feedback simple and beginner friendly.
+        """
 
-    st.subheader("AI Feedback")
-    st.write(feedback)
+        try:
+
+            feedback_response = client.chat.completions.create(
+                model="mistralai/mistral-7b-instruct",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": feedback_prompt
+                    }
+                ]
+            )
+
+            feedback = feedback_response.choices[0].message.content
+
+            st.subheader("AI Feedback")
+            st.write(feedback)
+
+        except Exception as e:
+
+            st.error(f"Error: {e}")
