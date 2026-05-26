@@ -8,7 +8,7 @@ load_dotenv()
 
 # OpenAI client
 client = OpenAI(
-    api_key=os.getenv("OPENAI_API_KEY")
+    api_key=st.secrets("OPENAI_API_KEY")
 )
 
 # Page title
