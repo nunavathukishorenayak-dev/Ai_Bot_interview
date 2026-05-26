@@ -52,7 +52,7 @@ if st.button("Generate Interview Questions"):
     """
 
     response = client.chat.completions.create(
-        model="gpt-4.1-mini",
+        model="mistralai/mistral-7b-instruct",
         messages=[
             {
                 "role": "user",
