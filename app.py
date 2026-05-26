@@ -61,15 +61,14 @@ if st.button("Generate Interview Questions"):
         try:
 
             response = client.chat.completions.create(
-                model="mistralai/mistral-7b-instruct",
-                messages=[
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ]
-            )
-
+    model="openai/gpt-oss-20b:free",
+    messages=[
+        {
+            "role": "user",
+            "content": prompt
+        }
+    ]
+)
             questions = response.choices[0].message.content
 
             st.subheader("Interview Questions")
